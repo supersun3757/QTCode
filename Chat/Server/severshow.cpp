@@ -1,0 +1,55 @@
+#include "severshow.h"
+#include "ui_severshow.h"
+#include <QDebug>
+
+SeverShow::SeverShow(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::SeverShow)
+{
+    ui->setupUi(this);
+
+    if(init_server()){
+        writtenLog("连接建立");
+    }else{
+        writtenLog("无连接");
+    }
+    //初始化服务端设置并监听端口
+
+    if(get_message()){
+        writtenLog("接受到信息");
+    }else{
+        writtenLog("无信息接受");
+    }
+
+
+}
+
+SeverShow::~SeverShow()
+{
+    delete ui;
+}
+
+bool SeverShow::init_server(){
+
+    server = new QTcpServer(this);
+    if(server->listen(QHostAddress::Any, PORT)) {
+        socket = server->nextPendingConnection();
+//        qDebug()<<socket->peerAddress();
+        return true;
+    }
+    return false;
+}
+
+bool SeverShow::get_message(){
+    return true;
+}
+
+
+void SeverShow::writtenLog(QString logString){
+    QListWidgetItem * log = new QListWidgetItem();
+    QFont font = log->font();  // 获取当前字体
+    font.setPointSize(7);  // 设置字体大小为12
+    log->setFont(font);  // 应用新的字体设置
+    log->setText("* "+logString);
+    ui->logslist->addItem(log);
+}
